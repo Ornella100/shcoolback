@@ -37,6 +37,11 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=not DEBUG)
 SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE', default=not DEBUG)
 CSRF_COOKIE_SECURE = env.bool('CSRF_COOKIE_SECURE', default=not DEBUG)
+# Le frontend Vercel et l'API Render sont sur des sites distincts : les cookies
+# de session et CSRF doivent être envoyés dans les requêtes intersites HTTPS.
+# En local, conserver Lax pour http://localhost.
+SESSION_COOKIE_SAMESITE = env('SESSION_COOKIE_SAMESITE', default='Lax' if DEBUG else 'None')
+CSRF_COOKIE_SAMESITE = env('CSRF_COOKIE_SAMESITE', default='Lax' if DEBUG else 'None')
 SECURE_HSTS_SECONDS = env.int('SECURE_HSTS_SECONDS', default=0)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=False)
 SECURE_HSTS_PRELOAD = env.bool('SECURE_HSTS_PRELOAD', default=False)
