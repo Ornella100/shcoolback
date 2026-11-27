@@ -178,7 +178,20 @@ def get_sms_provider():
     return None
 
 
-def get_whatsapp_provider():
+def get_whatsapp_provider(school=None):
+    if school is not None:
+        connection = getattr(school, 'whatsapp_connection', None)
+        if connection is not None:
+            token = connection.get_access_token().strip()
+            phone_number_id = connection.phone_number_id.strip()
+            if token and phone_number_id:
+                return WhatsAppCloudProvider(
+                    access_token=token,
+                    phone_number_id=phone_number_id,
+                    api_version=connection.api_version.strip(),
+                    timeout=getattr(settings, 'WHATSAPP_TIMEOUT', 15),
+                )
+        return None
     token = getattr(settings, 'WHATSAPP_ACCESS_TOKEN', '').strip()
     phone_number_id = getattr(settings, 'WHATSAPP_PHONE_NUMBER_ID', '').strip()
     if not token or not phone_number_id:

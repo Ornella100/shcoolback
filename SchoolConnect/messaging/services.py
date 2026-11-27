@@ -196,7 +196,7 @@ def _attempt(parent, channel, ok, error):
     }
 
 
-def is_wired(channel):
+def is_wired(channel, school=None):
     """Ce canal dispose-t-il d'un vrai fournisseur ?
 
     Seul l'email en a un (Resend). WhatsApp reste simulé : `SIMULATE_UNWIRED_CHANNELS`
@@ -210,7 +210,7 @@ def is_wired(channel):
     if channel == Message.Channel.SMS:
         return get_sms_provider() is not None
     if channel == Message.Channel.WHATSAPP:
-        return get_whatsapp_provider() is not None
+        return get_whatsapp_provider(school=school) is not None
     return getattr(settings, 'SIMULATE_UNWIRED_CHANNELS', 'fail') == 'success'
 
 
@@ -233,7 +233,7 @@ def _deliver(parent, channel, contact, message, body, subject):
         return provider.send(contact, body)
 
     if channel == Message.Channel.WHATSAPP:
-        provider = get_whatsapp_provider()
+        provider = get_whatsapp_provider(school=message.school)
         if provider is None:
             return False, NO_GATEWAY_ERROR.format(channel=channel)
         return provider.send(contact, body)
@@ -255,7 +255,7 @@ def _try_channel(parent, channel, message, dry_run=False, body='', subject='', q
         # L'aperçu doit prédire l'envoi réel, sinon il annoncerait un coût SMS pour un
         # message qui finira en email gratuit. Il applique donc la même règle de canal
         # câblé — sans jamais contacter de fournisseur.
-        if not is_wired(channel):
+        if not is_wired(channel, school=message.school):
             return False, _attempt(parent, channel, False, NO_GATEWAY_ERROR.format(channel=channel))
         if quota is not None:
             quota.consume(channel)

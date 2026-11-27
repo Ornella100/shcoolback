@@ -59,6 +59,7 @@ from fees.views import FeeBatchView, FeeInvoiceViewSet, FeePaymentsView
 from push_notifications.views import PushConfigView, PushSubscriptionView
 from teachers.views import TeacherViewSet
 from schools.views import SchoolViewSet
+from schools.whatsapp_views import SchoolWhatsAppConnectionView
 
 router = DefaultRouter()
 router.register('schools', SchoolViewSet, basename='school')
@@ -87,6 +88,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('api/csrf/', csrf_view),
+    path('api/school/whatsapp/', SchoolWhatsAppConnectionView.as_view()),
     path('api/push/config/', PushConfigView.as_view()),
     path('api/push/subscription/', PushSubscriptionView.as_view()),
     path('api/register/', register_view),
